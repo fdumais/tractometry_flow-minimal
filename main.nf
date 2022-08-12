@@ -139,7 +139,7 @@ process Remove_Invalid_Streamlines {
       fi
       bname=\${bname/$params.bundle_suffix_to_remove/}
 
-      scil_remove_invalid_streamlines.py \$bundle ${sid}__\${bname}_ic.trk --cut_invalid -f
+      scil_remove_invalid_streamlines.py \$bundle ${sid}__\${bname}_ic.trk --cut_invalid --remove_single_point -f
     done
     """
 }
@@ -250,7 +250,7 @@ process Bundle_Label_And_Distance_Maps {
             --labels_color_dpp ${sid}__\${bname}_labels.trk \
             --distances_color_dpp ${sid}__\${bname}_distances.trk \
             --min_streamline_count ${params.min_streamline_count} \
-            --min_voxel_count ${params.min_voxel_count}
+            --min_voxel_count ${params.min_voxel_count} | echo "Done"
         done
     """
 }
@@ -392,7 +392,7 @@ process Bundle_Length_Stats {
     """
 }
 
-process Bundle_Endpoints_Map {
+/*process Bundle_Endpoints_Map {
     input:
     set sid, file(bundles) from bundles_for_endpoints_map
 
@@ -423,9 +423,9 @@ process Bundle_Endpoints_Map {
     scil_merge_json.py *_endpoints_map_raw.json ${sid}__endpoints_map_raw.json \
         --no_list --add_parent_key ${sid}
     """
-}
+}*/
 
-metrics_for_endpoints_roi_stats
+/*metrics_for_endpoints_roi_stats
     .mix(fixel_afd_for_endpoints_roi_stats)
     .groupTuple(by: 0)
      .map{it -> [it[0], it[1..-1].flatten()]}
@@ -487,16 +487,16 @@ metrics_for_endpoints_metrics
 bundles_for_endpoints_metrics
     .flatMap{ sid, bundles -> bundles.collect{[sid, it]} }
     .combine(metrics_afd_for_endpoints_metrics, by: 0)
-    .set{metrics_bundles_for_endpoints_metrics}
+    .set{metrics_bundles_for_endpoints_metrics}*/
 
-process Bundle_Endpoints_Metrics {
+/*process Bundle_Endpoints_Metrics {
     input:
     set sid, file(bundle), file(metrics) from metrics_bundles_for_endpoints_metrics
 
-    output:
-    file "*/*_endpoints_metric.nii.gz"
+    output:*/
+    //file "*/*_endpoints_metric.nii.gz"
 
-    when:
+    /*when:
     !params.skip_projection_endpoints_metrics
 
     script:
@@ -527,7 +527,7 @@ process Bundle_Endpoints_Metrics {
     rename s/${sid}__${sid}__/${sid}__/ *
 
     """
-}
+}*/
 
 metrics_for_mean_std
     .mix(fixel_afd_for_mean_std)
@@ -797,7 +797,7 @@ process Aggregate_All_Lesion_Load_Per_Point {
     """
 }
 
-endpoints_maps_to_aggregate
+/*endpoints_maps_to_aggregate
     .collect()
     .set{all_aggregate_endspoints_map}
 
@@ -839,7 +839,7 @@ process Aggregate_All_Endpoints_Metric_Stats {
     scil_merge_json.py $jsons endpoints_metric_stats.json --no_list
     scil_convert_json_to_xlsx.py endpoints_metric_stats.json endpoints_metric_stats.xlsx
     """
-}
+}*/
 
 bundles_length_stats_to_aggregate
     .collect()
